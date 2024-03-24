@@ -77,16 +77,11 @@ class SignUpScreen extends StatelessWidget {
                             fontSize: 30, fontWeight: FontWeight.bold),
                       )),
                   const SizedBox(
-                    height: 20,
+                    height: 16,
                   ),
-                  FadeInUp(
-                      duration: const Duration(milliseconds: 1200),
-                      child: Text(
-                        "Hãy tạo một tài khoảng, vì nó miễn phí mà bạn!",
-                        style: TextStyle(fontSize: 15, color: Colors.grey[700]),
-                      )),
                 ],
               ),
+              const SizedBox(height: 8),
               Column(
                 children: <Widget>[
                   FadeInUp(
@@ -96,6 +91,10 @@ class SignUpScreen extends StatelessWidget {
                   FadeInUp(
                     duration: const Duration(milliseconds: 1100),
                     child: makeInput(label: "Họ và tên"),
+                  ),
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 1200),
+                    child: makeInputWithDateTime(label: "Năm sinh"),
                   ),
                   FadeInUp(
                     duration: const Duration(
@@ -115,6 +114,7 @@ class SignUpScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
               FadeInUp(
                 duration: const Duration(milliseconds: 1500),
                 child: Container(
@@ -147,6 +147,7 @@ class SignUpScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
               FadeInUp(
                 duration: const Duration(milliseconds: 1600),
                 child: Row(
@@ -165,7 +166,9 @@ class SignUpScreen extends StatelessWidget {
                       child: const Text(
                         " Đăng nhập",
                         style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 18),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
                       ),
                     ),
                   ],
@@ -175,6 +178,100 @@ class SignUpScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget makeInputWithDateTime({label, obscureText = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        Row(
+          children: [
+            // Day Dropdown
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                  ),
+                ),
+                items: List.generate(
+                  31,
+                  (index) => DropdownMenuItem<String>(
+                    value: (index + 1).toString(),
+                    child: Text((index + 1).toString()),
+                  ),
+                ),
+                onChanged: (value) {
+                  // Handle day selection
+                },
+                hint: const Text('Ngày'),
+              ),
+            ),
+            const SizedBox(width: 10),
+            // Month Dropdown
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                  ),
+                ),
+                items: List.generate(
+                  12,
+                  (index) => DropdownMenuItem<String>(
+                    value: (index + 1).toString(),
+                    child: Text((index + 1).toString()),
+                  ),
+                ),
+                onChanged: (value) {
+                  // Handle month selection
+                },
+                hint: Text('Tháng'),
+              ),
+            ),
+            SizedBox(width: 10),
+            // Year Dropdown
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade400),
+                  ),
+                ),
+                items: List.generate(
+                  100,
+                  (index) => DropdownMenuItem<String>(
+                    value: (DateTime.now().year - index).toString(),
+                    child: Text((DateTime.now().year - index).toString()),
+                  ),
+                ),
+                onChanged: (value) {
+                  // Handle year selection
+                },
+                hint: Text('Năm'),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+      ],
     );
   }
 
@@ -209,7 +306,7 @@ class SignUpScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(
-          height: 30,
+          height: 20,
         ),
       ],
     );

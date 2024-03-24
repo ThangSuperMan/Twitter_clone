@@ -40,7 +40,7 @@ class LoginScreen extends StatelessWidget {
                       FadeInUp(
                           duration: const Duration(milliseconds: 1000),
                           child: const Text(
-                            "Login",
+                            "Đăng nhập",
                             style: TextStyle(
                                 fontSize: 30, fontWeight: FontWeight.bold),
                           )),
@@ -153,7 +153,10 @@ class LoginScreen extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-              fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black87),
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+            color: Colors.black87,
+          ),
         ),
         const SizedBox(
           height: 5,
@@ -170,7 +173,7 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(
-          height: 30,
+          height: 20,
         ),
       ],
     );
