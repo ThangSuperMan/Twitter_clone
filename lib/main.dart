@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:twitter_clone/screens/login_screen.dart';
 import 'package:twitter_clone/screens/posts_screen.dart';
+import 'package:twitter_clone/screens/signup_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,10 +16,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const PostsScreen(),
+      // home: const PostsScreen(),
+      home: const SignUpScreen(),
     );
   }
 }

@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:twitter_clone/widgets/create_post_popup_window.dart';
+import 'package:twitter_clone/screens/hello_screen.dart';
+import 'package:twitter_clone/screens/second_screen.dart';
+
+const POSTS_SCREEN_INDEX = 0;
+const CREATE_POST_SCREEN_INDEX = 2;
 
 class PostsScreen extends StatefulWidget {
   const PostsScreen({super.key});
@@ -7,6 +13,12 @@ class PostsScreen extends StatefulWidget {
   @override
   State<PostsScreen> createState() => _PostsScreenState();
 }
+
+List<Widget> screens = [
+  PostsScreen(),
+  SecondScreen(),
+  HelloScreen(),
+];
 
 class Post extends StatelessWidget {
   @override
@@ -297,6 +309,129 @@ class _PostsScreenState extends State<PostsScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: RedditStyleBottomNavigation(),
+    );
+  }
+}
+
+class RedditStyleBottomNavigation extends StatefulWidget {
+  @override
+  _RedditStyleBottomNavigationState createState() =>
+      _RedditStyleBottomNavigationState();
+}
+
+class _RedditStyleBottomNavigationState
+    extends State<RedditStyleBottomNavigation> {
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      currentIndex: _selectedIndex,
+      selectedLabelStyle: const TextStyle(color: Colors.red),
+      unselectedLabelStyle: const TextStyle(color: Colors.yellow),
+      onTap: _onItemTapped,
+      items: [
+        BottomNavigationBarItem(
+          icon: SvgPicture.string(
+            '''
+              <svg rpl="" fill="currentColor" height="20" icon-name="home-outline" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+                <path d="m17.71 8.549 1.244.832v8.523a1.05 1.05 0 0 1-1.052 1.046H12.73a.707.707 0 0 1-.708-.707v-4.507c0-.76-1.142-1.474-2.026-1.474-.884 0-2.026.714-2.026 1.474v4.507a.71.71 0 0 1-.703.707H2.098a1.046 1.046 0 0 1-1.052-1.043V9.381l1.244-.835v9.158h4.44v-3.968c0-1.533 1.758-2.72 3.27-2.72s3.27 1.187 3.27 2.72v3.968h4.44V8.549Zm2.04-1.784L10.646.655a1.12 1.12 0 0 0-1.28-.008L.25 6.765l.696 1.036L10 1.721l9.054 6.08.696-1.036Z"></path>
+              </svg>
+            ''',
+            color: Colors.black.withOpacity(0.6),
+            height: 26,
+            width: 26,
+          ),
+          label: 'Trang chủ',
+        ),
+        BottomNavigationBarItem(
+          icon: SvgPicture.string(
+            '''
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="x19dipnz x1lliihq x1k90msu x2h7rmj x1qfuztq" style="--color: var(--secondary-icon);">
+                <path d="M8 2.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9zM5.5 7a2.5 2.5 0 1 1 5 0 2.5 2.5 0 0 1-5 0zm-.25 6A4.75 4.75 0 0 0 .5 17.75 3.25 3.25 0 0 0 3.75 21h8.5a3.25 3.25 0 0 0 3.25-3.25A4.75 4.75 0 0 0 10.75 13h-5.5zM2.5 17.75A2.75 2.75 0 0 1 5.25 15h5.5a2.75 2.75 0 0 1 2.75 2.75c0 .69-.56 1.25-1.25 1.25h-8.5c-.69 0-1.25-.56-1.25-1.25zM14 9.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0zM17.5 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm0 6.5a1 1 0 1 0 0 2h2.3a1.7 1.7 0 0 1 1.7 1.7.8.8 0 0 1-.8.8h-3.2a1 1 0 1 0 0 2h3.2a2.8 2.8 0 0 0 2.8-2.8 3.7 3.7 0 0 0-3.7-3.7h-2.3z"></path>
+              </svg>
+            ''',
+            color: Colors.black.withOpacity(0.6),
+            height: 26,
+            width: 26,
+          ),
+          label: 'Cộng đồng',
+        ),
+        BottomNavigationBarItem(
+          icon: SvgPicture.string(
+            '''
+            <svg rpl="" fill="currentColor" height="20" icon-name="add-outline" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 9.375h-8.375V1h-1.25v8.375H1v1.25h8.375V19h1.25v-8.375H19v-1.25Z"></path>
+            </svg>
+            ''',
+            color: Colors.black.withOpacity(0.6),
+            height: 26,
+            width: 26,
+          ),
+          label: 'Tạo bài',
+        ),
+        BottomNavigationBarItem(
+          icon: SvgPicture.string(
+            '''
+              <svg rpl="" fill="currentColor" height="20" icon-name="chat-outline" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11.61 19.872a10.013 10.013 0 0 0 6.51-4.035A9.999 9.999 0 0 0 12.275.264c-1.28-.3-2.606-.345-3.903-.132a10.05 10.05 0 0 0-8.25 8.311 9.877 9.877 0 0 0 1.202 6.491l-1.24 4.078a.727.727 0 0 0 .178.721.72.72 0 0 0 .72.19l4.17-1.193A9.87 9.87 0 0 0 9.998 20c.54 0 1.079-.043 1.612-.128ZM1.558 18.458l1.118-3.69-.145-.24A8.647 8.647 0 0 1 1.36 8.634a8.778 8.778 0 0 1 7.21-7.27 8.765 8.765 0 0 1 8.916 3.995 8.748 8.748 0 0 1-2.849 12.09 8.763 8.763 0 0 1-3.22 1.188 8.68 8.68 0 0 1-5.862-1.118l-.232-.138-3.764 1.076ZM6.006 9a1.001 1.001 0 0 0-.708 1.707A1 1 0 1 0 6.006 9Zm4.002 0a1.001 1.001 0 0 0-.195 1.981 1 1 0 1 0 .195-1.98Zm4.003 0a1.001 1.001 0 1 0 0 2.003 1.001 1.001 0 0 0 0-2.003Z"></path>
+              </svg>
+            ''',
+            color: Colors.black.withOpacity(0.6),
+            height: 26,
+            width: 26,
+          ),
+          label: 'Nhắn tin',
+        ),
+        BottomNavigationBarItem(
+          icon: SvgPicture.string(
+            '''
+              <svg rpl="" fill="currentColor" height="20" icon-name="notification-outline" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 18h1a2 2 0 0 1-4 0h3Zm8-3.792v.673A1.12 1.12 0 0 1 17.883 16H2.117A1.12 1.12 0 0 1 1 14.881v-.673a3.947 3.947 0 0 1 1.738-3.277A2.706 2.706 0 0 0 3.926 8.7V7.087a6.07 6.07 0 0 1 12.138 0l.01 1.613a2.7 2.7 0 0 0 1.189 2.235A3.949 3.949 0 0 1 19 14.208Zm-1.25 0a2.7 2.7 0 0 0-1.188-2.242A3.956 3.956 0 0 1 14.824 8.7V7.088a4.819 4.819 0 1 0-9.638 0v1.615a3.956 3.956 0 0 1-1.738 3.266 2.7 2.7 0 0 0-1.198 2.239v.542h15.5v-.542Z"></path>
+              </svg>
+            ''',
+            color: Colors.black.withOpacity(0.6),
+            height: 26,
+            width: 26,
+          ),
+          label: 'Thông báo',
+        ),
+      ],
+    );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    bool isScreenExists = index > 0 && index < screens.length;
+    if (isScreenExists) {
+      switch (index) {
+        case POSTS_SCREEN_INDEX:
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const PostsScreen()));
+        case 1:
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => SecondScreen()));
+        case CREATE_POST_SCREEN_INDEX:
+          _showNewPostModal(context);
+          break;
+      }
+    }
+  }
+
+  void _showNewPostModal(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height - 300;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return CreatePostPopupWindow(screenHeight: screenHeight);
+      },
     );
   }
 }
