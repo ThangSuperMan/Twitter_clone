@@ -5,6 +5,7 @@ import 'package:twitter_clone/screens/hello_screen.dart';
 import 'package:twitter_clone/screens/second_screen.dart';
 
 const POSTS_SCREEN_INDEX = 0;
+const HELLO_SCREEN_INDEX = 1;
 const CREATE_POST_SCREEN_INDEX = 2;
 
 class PostsScreen extends StatefulWidget {
@@ -413,7 +414,7 @@ class _RedditStyleBottomNavigationState
         case POSTS_SCREEN_INDEX:
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const PostsScreen()));
-        case 1:
+        case HELLO_SCREEN_INDEX:
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => SecondScreen()));
         case CREATE_POST_SCREEN_INDEX:
