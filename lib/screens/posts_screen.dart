@@ -3,10 +3,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:twitter_clone/widgets/create_post_popup_window.dart';
 import 'package:twitter_clone/screens/hello_screen.dart';
 import 'package:twitter_clone/screens/second_screen.dart';
+import 'package:twitter_clone/screen_chat/home_screen.dart';
 
 const POSTS_SCREEN_INDEX = 0;
 const HELLO_SCREEN_INDEX = 1;
 const CREATE_POST_SCREEN_INDEX = 2;
+const MESSAGE_SCREEN_INDEX = 3;
 
 class PostsScreen extends StatefulWidget {
   const PostsScreen({super.key});
@@ -19,6 +21,7 @@ List<Widget> screens = [
   PostsScreen(),
   SecondScreen(),
   HelloScreen(),
+  HomeScreen(),
 ];
 
 class Post extends StatelessWidget {
@@ -419,6 +422,9 @@ class _RedditStyleBottomNavigationState
               context, MaterialPageRoute(builder: (context) => SecondScreen()));
         case CREATE_POST_SCREEN_INDEX:
           _showNewPostModal(context);
+        case  MESSAGE_SCREEN_INDEX:
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => HomeScreen()));
           break;
       }
     }
@@ -435,4 +441,6 @@ class _RedditStyleBottomNavigationState
       },
     );
   }
+
+  
 }
