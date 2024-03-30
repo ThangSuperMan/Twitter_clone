@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:twitter_clone/screens/posts_screen.dart';
+import 'package:twitter_clone/widgets_chats/widgets.dart';
 
 class PostDetailScreen extends StatefulWidget {
   const PostDetailScreen({super.key});
@@ -1061,6 +1063,26 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             ),
             floating: true,
             pinned: true,
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              // TODO: need to fix style
+              child: Container(
+                width: 50,
+                height: 50,
+                child: IconBorder(
+                  icon: CupertinoIcons.arrow_uturn_left_circle,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              // child: IconBorder(
+              //   icon: CupertinoIcons.arrow_uturn_left_circle,
+              //   onTap: () { },
+              // ),
+            ),
           ),
           SliverToBoxAdapter(
             child: Post(),

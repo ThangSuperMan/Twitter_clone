@@ -236,7 +236,6 @@ class _PostsScreenState extends State<PostsScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          print('onTap menu icon');
                           Scaffold.of(context).openDrawer();
                         },
                         child: Container(
