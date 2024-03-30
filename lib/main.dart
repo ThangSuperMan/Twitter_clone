@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:twitter_clone/screens/login_screen.dart';
+import 'package:twitter_clone/screens/post_detail_screen.dart';
 import 'package:twitter_clone/screens/posts_screen.dart';
 import 'package:twitter_clone/screens/signup_screen.dart';
+import 'package:twitter_clone/widgets/sidebar.dart';
 
 void main() {
   runApp(const MyApp());

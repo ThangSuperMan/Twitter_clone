@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:twitter_clone/screens/login_screen.dart';
 import 'package:twitter_clone/screens/posts_screen.dart';
 import 'package:twitter_clone/utils/colors.dart';
+import 'package:twitter_clone/widgets/sidebar.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
