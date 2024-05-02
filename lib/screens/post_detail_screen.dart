@@ -2,16 +2,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:twitter_clone/screens/posts_screen.dart';
+import 'package:twitter_clone/services/post_service.dart';
 import 'package:twitter_clone/widgets_chats/widgets.dart';
 
 class PostDetailScreen extends StatefulWidget {
-  const PostDetailScreen({super.key});
+  final Post post;
+
+  const PostDetailScreen({Key? key, required this.post}) : super(key: key);
 
   @override
   State<PostDetailScreen> createState() => _PostDetailScreenState();
 }
 
-class Post extends StatelessWidget {
+class PostItem extends StatelessWidget {
+  final Post post;
+
+  const PostItem({Key? key, required this.post}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -34,10 +41,8 @@ class Post extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CircleAvatar(
-                backgroundImage: NetworkImage(
-                  'https://styles.redditmedia.com/t5_bbhq9/styles/profileIcon_snoo-nftv2_bmZ0X2VpcDE1NToxMzdfZjMzYWQ4NmJiNTRhMjc4YTZjOWY5YzA3NmY0ZWQ1YTM0YzUzMTk2N18zODYyMDM_rare_a41e6e1c-d338-4942-a195-814cea9236c6-headshot.png?width=64&height=64&frame=1&auto=webp&crop=64:64,smart&s=b17580b874344506766dca9268f88ae58f747d73',
-                ),
+              CircleAvatar(
+                backgroundImage: NetworkImage(post.imageUrl.toString()),
                 radius: 20,
               ),
               const SizedBox(width: 12),
@@ -77,14 +82,13 @@ class Post extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Đây là một cái bài đăng siêu vip pro nha :)',
+          Text(
+            post.content.toString(),
           ),
           const SizedBox(height: 8),
           ClipRRect(
             borderRadius: BorderRadius.circular(14),
-            child: Image.network(
-                'https://cdn.dribbble.com/userupload/13030534/file/original-469df4f70d615c1483155853a48a4f25.jpg?resize=2048x1536'),
+            child: Image.network(post.imageUrl.toString()),
           ),
           const SizedBox(height: 8),
           Row(
@@ -1085,7 +1089,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             ),
           ),
           SliverToBoxAdapter(
-            child: Post(),
+            child: PostItem(post: widget.post),
           )
         ],
       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:twitter_clone/base_client.dart';
 import 'package:twitter_clone/screens/post_detail_screen.dart';
+import 'package:twitter_clone/services/post_service.dart';
 import 'package:twitter_clone/widgets/create_post_popup_window.dart';
 import 'package:twitter_clone/screens/hello_screen.dart';
 import 'package:twitter_clone/screens/second_screen.dart';
@@ -26,7 +28,11 @@ List<Widget> screens = [
   HomeScreen(),
 ];
 
-class Post extends StatelessWidget {
+class PostItem extends StatelessWidget {
+  final Post post;
+
+  const PostItem({Key? key, required this.post}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -84,22 +90,19 @@ class Post extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Xin chào các bạn',
+          Text(
+            post.title.toString(),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Đây là một cái bài đăng siêu vip pro nha :)',
-          ),
+          Text(post.content.toString()),
           const SizedBox(height: 8),
           ClipRRect(
             borderRadius: BorderRadius.circular(14),
-            child: Image.network(
-                'https://cdn.dribbble.com/userupload/13030534/file/original-469df4f70d615c1483155853a48a4f25.jpg?resize=2048x1536'),
+            child: Image.network(post.imageUrl.toString()),
           ),
           const SizedBox(height: 8),
           Row(
@@ -218,117 +221,199 @@ class Post extends StatelessWidget {
 }
 
 class _PostsScreenState extends State<PostsScreen> {
+  List<Post> _posts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    try {
+      var response = await BaseClient().get('/api/v1/posts').catchError((err) {
+        print("err: $err");
+      });
+      print("response: $response.metadata");
+      // late List<Post> posts = [];
+      // var posts = postFromJson(response);
+      print("posts: $postFromJson(response)");
+      // debugPrint(posts.length.toString());
+      setState(() {
+        _posts = postFromJson(response);
+      });
+      // if (response.statusCode == 200) {
+      // } else {
+      //   throw Exception('Failed to load data');
+      // }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const Sidebar(),
       backgroundColor: Colors.white,
-      body: CustomScrollView(
-        slivers: <Widget>[
-          // TODO: this should me migrate to become a widget
-          SliverAppBar(
-            toolbarHeight: 52,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: Builder(
-                builder: (BuildContext context) {
-                  return Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                        child: Container(
-                          width: 28,
-                          height: 28,
-                          child: SvgPicture.string(
-                            '''
-                           <svg stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 6h16M4 12h16M4 18h16"></path>
-                           </svg>
-                         ''',
-                          ),
-                        ),
+      appBar: AppBar(
+        toolbarHeight: 52,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Builder(
+            builder: (BuildContext context) {
+              return Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      child: SvgPicture.string(
+                        '''
+                         <svg stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 6h16M4 12h16M4 18h16"></path>
+                         </svg>
+                       ''',
                       ),
-                    ],
-                  );
-                },
-              ),
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SvgPicture.string(
-                      '''
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SvgPicture.string(
+                  '''
                   <svg fill="currentColor" height="24" icon-name="search-outline" viewBox="0 0 20 20" width="24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M19.5 18.616 14.985 14.1a8.528 8.528 0 1 0-.884.884l4.515 4.515.884-.884ZM1.301 8.553a7.253 7.253 0 1 1 7.252 7.253 7.261 7.261 0 0 1-7.252-7.253Z"></path>
                   </svg>
                 ''',
-                      height: 26,
-                      width: 26,
-                    ),
-                    const SizedBox(width: 20),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      child: Stack(
-                        children: [
-                          const CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              'https://preview.redd.it/snoovatar/avatars/nftv2_bmZ0X2VpcDE1NToxMzdfZWI5NTlhNzE1ZGZmZmU2ZjgyZjQ2MDU1MzM5ODJjNDg1OWNiMTRmZV8yNTU5MjM0OQ_rare_7b15159a-149e-48db-b70f-e9a3f0b94af2-headshot.png?width=128&height=128&crop=smart&auto=webp&s=fe40df49b6cfeeeaa9ae43fa8476482c2157cd96',
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            child: Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.green,
-                                border:
-                                    Border.all(color: Colors.white, width: 2),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                  height: 26,
+                  width: 26,
                 ),
-              ),
-            ],
-            shape: const Border(
-              bottom: BorderSide(
-                color: Color(0xFFF0F4F5),
-                width: 1.0,
-              ),
+                const SizedBox(width: 20),
+                Container(
+                  width: 40,
+                  height: 40,
+                  child: Stack(
+                    children: [
+                      const CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          'https://preview.redd.it/snoovatar/avatars/nftv2_bmZ0X2VpcDE1NToxMzdfZWI5NTlhNzE1ZGZmZmU2ZjgyZjQ2MDU1MzM5ODJjNDg1OWNiMTRmZV8yNTU5MjM0OQ_rare_7b15159a-149e-48db-b70f-e9a3f0b94af2-headshot.png?width=128&height=128&crop=smart&auto=webp&s=fe40df49b6cfeeeaa9ae43fa8476482c2157cd96',
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.green,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
-            floating: true,
-            pinned: true,
           ),
-          SliverToBoxAdapter(
-            child: GestureDetector(
+        ],
+        shape: const Border(
+          bottom: BorderSide(
+            color: Color(0xFFF0F4F5),
+            width: 1.0,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: RefreshIndicator(
+        onRefresh: fetchData,
+        child: ListView.builder(
+          itemCount: _posts.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
               onTap: () {
+                print("_posts.length: $_posts.length");
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PostDetailScreen(),
+                    builder: (context) => PostDetailScreen(post: _posts[index]),
                   ),
                 );
               },
-              child: Post(),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Post(),
-          ),
-        ],
+              child: PostItem(post: _posts[index]),
+            );
+          },
+        ),
       ),
+      // body: RefreshIndicator(
+      //   onRefresh: () async {
+      //     var response =
+      //         await BaseClient().get('/api/v1/posts').catchError((err) {
+      //       print("err: $err");
+      //     });
+      //     print("response: $response.metadata");
+      //     // late List<Post> posts = [];
+      //     var posts = postFromJson(response);
+      //     print("posts: $postFromJson(response)");
+      //     debugPrint(posts.length.toString());
+
+      //     // var hehe = response['metadata'];
+      //     // print("hehe: $hehe");
+      //     // print("response['metadata']: $response.metadata");
+      //     // var hehe = response['metadata'].length;
+      //     // print("hehe: $hehe");
+      //     // for (var i = 0; i < response['metadata'].length; i++) {
+      //     //   final entry = response['metadata'][i];
+      //     //   print("entry: $entry");
+      //     //   users.add(Post.fromJson(entry));
+      //     // }
+      //     // print("users: $users");
+      //     // await Future.delayed(
+      //     //   const Duration(seconds: 2),
+      //     // );
+      //   },
+      //   child: ListView(
+      //     children: <Widget>[
+      //       GestureDetector(
+      //         onTap: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute(
+      //               builder: (context) => PostDetailScreen(),
+      //             ),
+      //           );
+      //         },
+      //         child: PostItem(),
+      //       ),
+      //       GestureDetector(
+      //         onTap: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute(
+      //               builder: (context) => PostDetailScreen(),
+      //             ),
+      //           );
+      //         },
+      //         child: PostItem(),
+      //       ),
+      //     ],
+      //   ),
+      // ),
       bottomNavigationBar: RedditStyleBottomNavigation(),
     );
   }
