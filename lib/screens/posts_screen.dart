@@ -235,17 +235,10 @@ class _PostsScreenState extends State<PostsScreen> {
         print("err: $err");
       });
       print("response: $response.metadata");
-      // late List<Post> posts = [];
-      // var posts = postFromJson(response);
       print("posts: $postFromJson(response)");
-      // debugPrint(posts.length.toString());
       setState(() {
         _posts = postFromJson(response);
       });
-      // if (response.statusCode == 200) {
-      // } else {
-      //   throw Exception('Failed to load data');
-      // }
     } catch (error) {
       print('Error: $error');
     }

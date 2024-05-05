@@ -1,10 +1,33 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:twitter_clone/base_client.dart';
 import 'package:twitter_clone/screens/signup_screen.dart';
+import 'package:twitter_clone/services/auth_service.dart';
 import 'package:twitter_clone/utils/colors.dart';
+import 'package:twitter_clone/widgets/custom_snackbar.dart';
+import 'package:twitter_clone/widgets/input_field.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void handleLogin() async {
+    String? token = await AuthService.getToken();
+    print("token: $token");
+    // String email = _emailController.text;
+    // String password = _passwordController.text;
+
+    // if (email != '' && password != '') {
+    //   AuthService.login(email, password);
+    // }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +48,7 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Container(
+      body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: double.infinity,
         child: Column(
@@ -61,12 +84,20 @@ class LoginScreen extends StatelessWidget {
                     child: Column(
                       children: <Widget>[
                         FadeInUp(
-                            duration: const Duration(milliseconds: 1200),
-                            child: makeInput(label: "Email")),
+                          duration: const Duration(milliseconds: 1200),
+                          child: InputField(
+                            label: "Email",
+                            controller: _emailController,
+                          ),
+                        ),
                         FadeInUp(
-                            duration: const Duration(milliseconds: 1300),
-                            child: makeInput(
-                                label: "Mật khẩu", obscureText: true)),
+                          duration: const Duration(milliseconds: 1300),
+                          child: InputField(
+                            label: "Mật khẩu",
+                            obscureText: true,
+                            controller: _passwordController,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -87,7 +118,9 @@ class LoginScreen extends StatelessWidget {
                           child: MaterialButton(
                             minWidth: double.infinity,
                             height: 60,
-                            onPressed: () {},
+                            onPressed: () {
+                              handleLogin();
+                            },
                             color: AppColor.primaryColor,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
@@ -143,39 +176,6 @@ class LoginScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget makeInput({label, obscureText = false}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w400,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(
-          height: 5,
-        ),
-        TextField(
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-            enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400)),
-            border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400)),
-          ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-      ],
     );
   }
 }

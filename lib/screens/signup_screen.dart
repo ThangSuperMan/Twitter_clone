@@ -1,12 +1,74 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:twitter_clone/base_client.dart';
 import 'package:twitter_clone/screens/login_screen.dart';
 import 'package:twitter_clone/screens/posts_screen.dart';
 import 'package:twitter_clone/utils/colors.dart';
-import 'package:twitter_clone/widgets/sidebar.dart';
+import 'package:twitter_clone/widgets/custom_snackbar.dart';
+import 'package:twitter_clone/widgets/input_field.dart';
+import 'package:twitter_clone/widgets/input_field_datetime.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
+
+  @override
+  _SignUpScreenState createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  late String dateOfBirth;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  void handleSignUp() async {
+    String email = _emailController.text;
+    String firstName = _firstNameController.text;
+    String lastName = _lastNameController.text;
+    String password = _passwordController.text;
+    String confirmPassword = _confirmPasswordController.text;
+
+    if (password != confirmPassword) {
+      print("password and confirmPassword does not match");
+    }
+
+    try {
+      Map<String, dynamic> object = {
+        "email": email,
+        "first_name": firstName,
+        "last_name": lastName,
+        "date_of_birth": dateOfBirth,
+        "password": password,
+      };
+      print("object: $object");
+
+      var response = await BaseClient().post("/api/v1/register", object);
+      print("response: $response");
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar(
+          message: 'Đăng ký tài khoản thành công!',
+          color: Colors.green,
+        ),
+      );
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,51 +133,66 @@ class SignUpScreen extends StatelessWidget {
               Column(
                 children: <Widget>[
                   FadeInUp(
-                      duration: const Duration(milliseconds: 1000),
-                      child: const Text(
-                        "Đăng ký",
-                        style: TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.bold),
-                      )),
-                  const SizedBox(
-                    height: 16,
+                    duration: const Duration(milliseconds: 1000),
+                    child: const Text(
+                      "Đăng ký",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Column(
                 children: <Widget>[
                   FadeInUp(
                     duration: const Duration(milliseconds: 1000),
-                    child: makeInput(label: "Email"),
+                    child: InputField(
+                        label: "Email *", controller: _emailController),
                   ),
                   FadeInUp(
                     duration: const Duration(milliseconds: 1100),
-                    child: makeInput(label: "Họ và tên"),
+                    child: InputField(
+                        label: "Họ *", controller: _lastNameController),
+                  ),
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 1100),
+                    child: InputField(
+                        label: "Tên *", controller: _firstNameController),
                   ),
                   FadeInUp(
                     duration: const Duration(milliseconds: 1200),
-                    child: makeInputWithDateTime(label: "Năm sinh"),
+                    child: InputFieldDateTime(
+                        label: "Năm sinh *",
+                        onChanged: (day, month, year) {
+                          if (day != '' && month != '' && year != '') {
+                            dateOfBirth =
+                                '$year-${month.padLeft(2, '0')}-${day.padLeft(2, '0')}';
+                            print("dateOfBirth : $dateOfBirth ");
+                          }
+                        }),
                   ),
                   FadeInUp(
                     duration: const Duration(
                       milliseconds: 1300,
                     ),
-                    child: makeInput(
-                      label: "Mật khẩu",
-                      obscureText: true,
-                    ),
+                    child: InputField(
+                        label: "Mật khẩu *",
+                        obscureText: true,
+                        controller: _passwordController),
                   ),
                   FadeInUp(
                     duration: const Duration(milliseconds: 1400),
-                    child: makeInput(
-                      label: "Xác nhận mật khẩu",
-                      obscureText: true,
-                    ),
+                    child: InputField(
+                        label: "Xác nhận mật khẩu *",
+                        obscureText: true,
+                        controller: _confirmPasswordController),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               FadeInUp(
                 duration: const Duration(milliseconds: 1500),
                 child: Container(
@@ -132,7 +209,9 @@ class SignUpScreen extends StatelessWidget {
                   child: MaterialButton(
                     minWidth: double.infinity,
                     height: 60,
-                    onPressed: () {},
+                    onPressed: () {
+                      handleSignUp();
+                    },
                     color: AppColor.primaryColor,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -148,7 +227,7 @@ class SignUpScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               FadeInUp(
                 duration: const Duration(milliseconds: 1600),
                 child: Row(
@@ -181,135 +260,8 @@ class SignUpScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget makeInputWithDateTime({label, obscureText = false}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w400,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(
-          height: 5,
-        ),
-        Row(
-          children: [
-            // Day Dropdown
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey.shade400),
-                  ),
-                ),
-                items: List.generate(
-                  31,
-                  (index) => DropdownMenuItem<String>(
-                    value: (index + 1).toString(),
-                    child: Text((index + 1).toString()),
-                  ),
-                ),
-                onChanged: (value) {
-                  // Handle day selection
-                },
-                hint: const Text('Ngày'),
-              ),
-            ),
-            const SizedBox(width: 10),
-            // Month Dropdown
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey.shade400),
-                  ),
-                ),
-                items: List.generate(
-                  12,
-                  (index) => DropdownMenuItem<String>(
-                    value: (index + 1).toString(),
-                    child: Text((index + 1).toString()),
-                  ),
-                ),
-                onChanged: (value) {
-                  // Handle month selection
-                },
-                hint: Text('Tháng'),
-              ),
-            ),
-            SizedBox(width: 10),
-            // Year Dropdown
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey.shade400),
-                  ),
-                ),
-                items: List.generate(
-                  100,
-                  (index) => DropdownMenuItem<String>(
-                    value: (DateTime.now().year - index).toString(),
-                    child: Text((DateTime.now().year - index).toString()),
-                  ),
-                ),
-                onChanged: (value) {
-                  // Handle year selection
-                },
-                hint: Text('Năm'),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-      ],
-    );
-  }
-
-  Widget makeInput({label, obscureText = false}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w400,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(
-          height: 5,
-        ),
-        TextField(
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 0,
-              horizontal: 10,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade400),
-            ),
-            border: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade400),
-            ),
-          ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-      ],
-    );
-  }
 }
+
+// class SignUpScreen extends StatelessWidget {
+//   const SignUpScreen({super.key});
+// }
