@@ -1,6 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:twitter_clone/base_client.dart';
+import 'package:twitter_clone/screens/posts_screen.dart';
 import 'package:twitter_clone/screens/signup_screen.dart';
 import 'package:twitter_clone/services/auth_service.dart';
 import 'package:twitter_clone/utils/colors.dart';
@@ -19,14 +19,28 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   void handleLogin() async {
-    String? token = await AuthService.getToken();
-    print("token: $token");
-    // String email = _emailController.text;
-    // String password = _passwordController.text;
+    // String? token = await AuthService.getToken();
+    // print("token: $token");
 
-    // if (email != '' && password != '') {
-    //   AuthService.login(email, password);
-    // }
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    if (email != '' && password != '') {
+      AuthService.login(email, password);
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar(
+          message: 'Đăng nhập thành công',
+          color: Colors.green,
+        ),
+      );
+
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PostsScreen()),
+        );
+      });
+    }
   }
 
   @override
