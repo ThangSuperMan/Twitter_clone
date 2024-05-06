@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:twitter_clone/screens/login_screen.dart';
+import 'package:twitter_clone/services/global_service.dart';
 import 'package:twitter_clone/utils/colors.dart';
 
 class Sidebar extends StatefulWidget {
@@ -9,6 +11,23 @@ class Sidebar extends StatefulWidget {
 }
 
 class _SidebarState extends State<Sidebar> {
+  String? fullName;
+  String? email;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserInfo();
+  }
+
+  Future<void> loadUserInfo() async {
+    final user = await GlobalService.getUserLoggedInInfo();
+    setState(() {
+      fullName = user?['full_name'];
+      email = user?['email'];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -16,24 +35,24 @@ class _SidebarState extends State<Sidebar> {
         // Important: Remove any padding from the ListView.
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
+          DrawerHeader(
+            decoration: const BoxDecoration(
               color: AppColor.primaryColor,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 30,
                   backgroundImage: NetworkImage(
                       'https://googleflutter.com/sample_image.jpg'),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 0,
                 ),
-                Text('Nguyễn Phú Hùng'),
-                Text('20dh111995@st.huflit.edu.vn'),
-                Text('2 Đang theo dõi   0 Được theo dõi'),
+                Text(fullName ?? 'Unknown'),
+                Text(email ?? 'unknown@gmail.com'),
+                const Text('2 Đang theo dõi   0 Được theo dõi'),
               ],
             ),
           ),
@@ -69,6 +88,16 @@ class _SidebarState extends State<Sidebar> {
             title: const Text('Kiếm tiền'),
             onTap: () {
               Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Đăng xuất'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
             },
           ),
           const Divider(
