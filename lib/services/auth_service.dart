@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:twitter_clone/services/global_service.dart';
 
 const String baseUrl = 'http://localhost:3000';
 
@@ -22,9 +23,20 @@ class AuthService {
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
         String token = jsonResponse['metadata']['token'] as String;
+        String email = jsonResponse['metadata']['email'] as String;
+        String fullName = jsonResponse['metadata']['full_name'] as String;
+        int userId = jsonResponse['metadata']['user_id'] as int;
 
-        await storeToken(token);
+        Map<String, dynamic> userInfo = {
+          "user_id": userId,
+          "email": email,
+          "full_name": fullName,
+          "token": token
+        };
 
+        print("userInfo: $userInfo");
+
+        await GlobalService.storeUserLoggedInInfo(userInfo);
         print('Token: $token');
       } else {
         print('Request failed with status: ${response.statusCode}.');
