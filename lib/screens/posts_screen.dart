@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:twitter_clone/base_client.dart';
 import 'package:twitter_clone/screens/post_detail_screen.dart';
+import 'package:twitter_clone/services/global_service.dart';
 import 'package:twitter_clone/services/post_service.dart';
 import 'package:twitter_clone/widgets/create_post_popup_window.dart';
 import 'package:twitter_clone/screens/hello_screen.dart';
@@ -22,16 +23,24 @@ class PostsScreen extends StatefulWidget {
 }
 
 List<Widget> screens = [
-  PostsScreen(),
+  const PostsScreen(),
   SecondScreen(),
   HelloScreen(),
-  HomeScreen(),
+  const HomeScreen(),
 ];
 
 class PostItem extends StatelessWidget {
   final Post post;
 
-  const PostItem({Key? key, required this.post}) : super(key: key);
+  const PostItem({super.key, required this.post});
+
+  String authorFullName(Post post) {
+    if (post.author != null) {
+      return "${post.author!.firstName} ${post.author!.lastName}";
+    } else {
+      return "";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,22 +66,24 @@ class PostItem extends StatelessWidget {
             children: [
               const CircleAvatar(
                 backgroundImage: NetworkImage(
+                  // TODO: using default image if the avatar_url is null
                   'https://styles.redditmedia.com/t5_bbhq9/styles/profileIcon_snoo-nftv2_bmZ0X2VpcDE1NToxMzdfZjMzYWQ4NmJiNTRhMjc4YTZjOWY5YzA3NmY0ZWQ1YTM0YzUzMTk2N18zODYyMDM_rare_a41e6e1c-d338-4942-a195-814cea9236c6-headshot.png?width=64&height=64&frame=1&auto=webp&crop=64:64,smart&s=b17580b874344506766dca9268f88ae58f747d73',
                 ),
                 radius: 20,
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'thangphan',
-                      style: TextStyle(
+                      authorFullName(post),
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(
+                    // TODO: get from created field
+                    const Text(
                       'Đăng cách đây 2 tiếng trước',
                       style: TextStyle(
                         color: Colors.grey,
@@ -92,7 +103,7 @@ class PostItem extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             post.title.toString(),
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
@@ -230,6 +241,9 @@ class _PostsScreenState extends State<PostsScreen> {
   }
 
   Future<void> fetchData() async {
+    Map<String, dynamic>? userInfo = await GlobalService.getUserLoggedInInfo();
+    print("userInfo: $userInfo");
+
     try {
       var response = await BaseClient().get('/api/v1/posts').catchError((err) {
         print("err: $err");
@@ -340,7 +354,6 @@ class _PostsScreenState extends State<PostsScreen> {
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                print("_posts.length: $_posts.length");
                 Navigator.push(
                   context,
                   MaterialPageRoute(
