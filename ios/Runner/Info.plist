@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>Chọn hình ảnh của bạn từ bộ sưu tập.</string>
+  <key>NSCameraUsageDescription</key>
+  <string>Chọn hình ảnh bằng việc chụp hình trực tiếp từ camera.</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Chọn video từ bộ chọn hình ảnh.</string>
 </dict>
 </plist>
