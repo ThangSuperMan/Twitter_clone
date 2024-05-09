@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:twitter_clone/base_client.dart';
+import 'package:twitter_clone/screens/inbox_screen.dart';
 import 'package:twitter_clone/screens/post_detail_screen.dart';
 import 'package:twitter_clone/services/global_service.dart';
 import 'package:twitter_clone/services/post_service.dart';
@@ -8,12 +11,14 @@ import 'package:twitter_clone/widgets/create_post_popup_window.dart';
 import 'package:twitter_clone/screens/hello_screen.dart';
 import 'package:twitter_clone/screens/second_screen.dart';
 import 'package:twitter_clone/screen_chat/home_screen.dart';
+import 'package:twitter_clone/widgets/custom_snackbar.dart';
 import 'package:twitter_clone/widgets/sidebar.dart';
 
 const POSTS_SCREEN_INDEX = 0;
 const HELLO_SCREEN_INDEX = 1;
 const CREATE_POST_SCREEN_INDEX = 2;
 const MESSAGE_SCREEN_INDEX = 3;
+const INBOX_SCREEN_INDEX = 4;
 
 class PostsScreen extends StatefulWidget {
   const PostsScreen({super.key});
@@ -29,16 +34,100 @@ List<Widget> screens = [
   const HomeScreen(),
 ];
 
-class PostItem extends StatelessWidget {
+// TODO: migrate from PostItem stateless widget to stateful widget
+class PostItem extends StatefulWidget {
   final Post post;
 
-  const PostItem({super.key, required this.post});
+  const PostItem({Key? key, required this.post}) : super(key: key);
 
-  String authorFullName(Post post) {
+  @override
+  _PostItemState createState() => _PostItemState();
+}
+
+class _PostItemState extends State<PostItem> {
+  late Post post;
+  late int totalLikes = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    post = widget.post;
+    getTotalOfLikesForPost();
+  }
+
+  String authorFullName() {
     if (post.author != null) {
       return "${post.author!.firstName} ${post.author!.lastName}";
     } else {
       return "";
+    }
+  }
+
+  void getTotalOfLikesForPost() async {
+    try {
+      int? postId = post.id;
+      var response = await BaseClient()
+          .get('/api/v1/post/$postId/likes')
+          .catchError((err) {
+        print("err: $err");
+      });
+      Map<String, dynamic> responseData = json.decode(response);
+      setState(() {
+        totalLikes = responseData['metadata']['total_likes'];
+        print("totalLikes: $totalLikes");
+      });
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  void handleLikePost() async {
+    print('handleLikePost');
+    try {
+      int? postId = post.id;
+      var response = await BaseClient()
+          .post('/api/v1/post/$postId/like', {}).catchError((err) {
+        print("err: $err");
+      });
+      print("response: $response");
+
+      Map<String, dynamic> responseData = json.decode(response);
+      String message = responseData['message'];
+      print("message: $message");
+      if (message == null) {}
+      // getTotalOfLikesForPost();
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   CustomSnackBar(
+      //     message: 'Bạn không thể thích bài viết mà bạn đã thích từ trước',
+      //     color: Colors.red,
+      //   ),
+      // );
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  void handleUnlikePost() async {
+    print('handleUnlikePost');
+    try {
+      int? postId = post.id;
+      var response = await BaseClient()
+          .post('/api/v1/post/$postId/unlike', {}).catchError((err) {
+        print("err: $err");
+      });
+
+      Map<String, dynamic> responseData = json.decode(response);
+      String message = responseData['message'];
+      if (response == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar(
+            message: 'Bạn không thể bỏ thích bài viết mà bạn đã thích từ trước',
+            color: Colors.red,
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error: $error');
     }
   }
 
@@ -77,7 +166,7 @@ class PostItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      authorFullName(post),
+                      authorFullName(),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -100,22 +189,35 @@ class PostItem extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            post.title.toString(),
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PostDetailScreen(post: post),
+                ),
+              );
+            },
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const SizedBox(height: 12),
+              Text(
+                post.title.toString(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(post.content.toString()),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Image.network(post.imageUrl.toString()),
+              ),
+              const SizedBox(height: 8),
+            ]),
           ),
-          const SizedBox(height: 8),
-          Text(post.content.toString()),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: Image.network(post.imageUrl.toString()),
-          ),
-          const SizedBox(height: 8),
           Row(
             children: [
               Container(
@@ -133,15 +235,20 @@ class PostItem extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      SvgPicture.string(
-                        '''
+                      GestureDetector(
+                        onTap: () {
+                          handleLikePost();
+                        },
+                        child: SvgPicture.string(
+                          '''
                             <svg rpl="" fill="currentColor" height="16" icon-name="upvote-outline" viewBox="0 0 20 20" width="16" xmlns="http://www.w3.org/2000/svg"> 
                               <path d="M12.877 19H7.123A1.125 1.125 0 0 1 6 17.877V11H2.126a1.114 1.114 0 0 1-1.007-.7 1.249 1.249 0 0 1 .171-1.343L9.166.368a1.128 1.128 0 0 1 1.668.004l7.872 8.581a1.25 1.25 0 0 1 .176 1.348 1.113 1.113 0 0 1-1.005.7H14v6.877A1.125 1.125 0 0 1 12.877 19ZM7.25 17.75h5.5v-8h4.934L10 1.31 2.258 9.75H7.25v8ZM2.227 9.784l-.012.016c.01-.006.014-.01.012-.016Z"></path>
                             </svg>
                           ''',
+                        ),
                       ),
                       const SizedBox(width: 8),
-                      const Text('21'),
+                      Text(totalLikes.toString()),
                       const SizedBox(width: 12),
                       Container(
                         height: 20,
@@ -153,12 +260,17 @@ class PostItem extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      SvgPicture.string(
-                        '''
+                      GestureDetector(
+                        onTap: () {
+                          handleUnlikePost();
+                        },
+                        child: SvgPicture.string(
+                          '''
                           <svg rpl="" fill="currentColor" height="16" icon-name="downvote-outline" viewBox="0 0 20 20" width="16" xmlns="http://www.w3.org/2000/svg">
                             <path d="M10 20a1.122 1.122 0 0 1-.834-.372l-7.872-8.581A1.251 1.251 0 0 1 1.118 9.7 1.114 1.114 0 0 1 2.123 9H6V2.123A1.125 1.125 0 0 1 7.123 1h5.754A1.125 1.125 0 0 1 14 2.123V9h3.874a1.114 1.114 0 0 1 1.007.7 1.25 1.25 0 0 1-.171 1.345l-7.876 8.589A1.128 1.128 0 0 1 10 20Zm-7.684-9.75L10 18.69l7.741-8.44H12.75v-8h-5.5v8H2.316Zm15.469-.05c-.01 0-.014.007-.012.013l.012-.013Z"></path>
                           </svg>
                         ''',
+                        ),
                       ),
                     ],
                   ),
@@ -352,17 +464,18 @@ class _PostsScreenState extends State<PostsScreen> {
         child: ListView.builder(
           itemCount: _posts.length,
           itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostDetailScreen(post: _posts[index]),
-                  ),
-                );
-              },
-              child: PostItem(post: _posts[index]),
-            );
+            return PostItem(post: _posts[index]);
+            // return GestureDetector(
+            // onTap: () {
+            //   Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => PostDetailScreen(post: _posts[index]),
+            //     ),
+            //   );
+            // },
+            // child: PostItem(post: _posts[index]),
+            // );
           },
         ),
       ),
@@ -530,8 +643,11 @@ class _RedditStyleBottomNavigationState
         case CREATE_POST_SCREEN_INDEX:
           _showNewPostModal(context);
         case MESSAGE_SCREEN_INDEX:
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => HomeScreen()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()));
+        case INBOX_SCREEN_INDEX:
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const InboxScreen()));
           break;
       }
     }

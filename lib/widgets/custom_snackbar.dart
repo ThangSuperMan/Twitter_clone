@@ -9,7 +9,7 @@ class CustomSnackBar extends SnackBar {
             style: const TextStyle(fontSize: 16),
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.green,
+          backgroundColor: color,
           duration: const Duration(seconds: 2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),

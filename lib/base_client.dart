@@ -10,6 +10,7 @@ class BaseClient {
 
   Future<dynamic> get(String api) async {
     var url = Uri.parse(baseURL + api);
+    print("url: $url");
     var headers = {'Authoriazation': 'Bearer sfi'};
 
     var response = await client.get(url, headers: headers);
@@ -23,7 +24,8 @@ class BaseClient {
 
     Map<String, dynamic>? userInfo = await GlobalService.getUserLoggedInInfo();
     String token = userInfo?['token'];
-    print("token here: $token");
+    print("url: $url");
+    print("token inside: $token");
 
     var header = {'Authorization': token};
 
